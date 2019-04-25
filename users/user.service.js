@@ -1,5 +1,8 @@
 ﻿const config = require('config.json');
 const jwt = require('jsonwebtoken');
+const LocalStorage = require('node-localstorage').LocalStorage;
+const localStorage = new LocalStorage('./tokens');
+const jwt_decode = require('jwt-decode');
 
 // users hardcoded for simplicity, store in a db for production applications
 const users = [
@@ -8,6 +11,7 @@ const users = [
 
 module.exports = {
     authenticate,
+    authenticateWithState,
     getAll
 };
 
@@ -20,6 +24,21 @@ async function authenticate({ username, password }) {
             ...userWithoutPassword,
             token
         };
+    }
+}
+
+async function authenticateWithState({ state }) {
+    let idToken = localStorage.getItem(state);
+    if (idToken) {
+        let decodedToken = jwt_decode(idToken);
+
+        return {
+            username: decodedToken.unique_name,
+            firstName: decodedToken.given_name,
+            lastName: decodedToken.family_name,
+            token: jwt.sign({ sub: decodedToken.oid }, config.secret)
+        }
+
     }
 }
 
