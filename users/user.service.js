@@ -31,7 +31,7 @@ async function authenticateWithState({ state }) {
     let idToken = localStorage.getItem(state);
     if (idToken) {
         let decodedToken = jwt_decode(idToken);
-
+        localStorage.removeItem(state);
         return {
             username: decodedToken.unique_name,
             firstName: decodedToken.given_name,
