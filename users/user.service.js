@@ -38,7 +38,8 @@ async function authenticateWithState({ state }) {
             lastName: decodedToken.family_name,
             token: jwt.sign({ sub: decodedToken.oid }, config.secret)
         }
-
+    } else {
+        return false;   
     }
 }
 
